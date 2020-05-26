@@ -9,11 +9,11 @@ padMessageHandler = require("ep_etherpad-lite/node/handler/PadMessageHandler"),
             async = require('ep_etherpad-lite/node_modules/async');
 
 var buffer = {};
-
+console.log("toy aqui");
 /*
 * Handle incoming messages from clients
 */
-exports.handleMessage = function(hook_name, context, callback){
+exports.handleMessage = async function(hook_name, context, callback){
   // Firstly ignore any request that aren't about cursor
   var iscursorMessage = false;
   if(context){
@@ -23,6 +23,7 @@ exports.handleMessage = function(hook_name, context, callback){
           if(context.message.data.type){
             if(context.message.data.type === 'cursor'){
               iscursorMessage = true;
+              console.log("Mensaje de cursor");
             }
           }
         }
@@ -44,10 +45,10 @@ exports.handleMessage = function(hook_name, context, callback){
      * myAuthorId -- The Id of the author who is trying to talk to the targetAuthorId
   ***/
   if(message.action === 'cursorPosition'){
-    authorManager.getAuthorName(message.myAuthorId, function(er, authorName){ // Get the authorname
-
+    //authorManager.getAuthorName(message.myAuthorId, function(er, authorName){ // Get the authorname
+    authorName = await authorManager.getAuthorName(message.myAuthorId);
       var msg = {
-        type: "COLLABROOM",
+        type: "CUSTOM",
         data: {
           type: "CUSTOM",
           payload: {
@@ -61,10 +62,11 @@ exports.handleMessage = function(hook_name, context, callback){
         }
       };
       sendToRoom(message, msg);
-    });
+      callback([null]);
+    //});
+  } else {
+    callback([null]);
   }
-
-  callback([null]);
 }
 
 
